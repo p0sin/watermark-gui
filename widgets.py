@@ -24,12 +24,14 @@ class AddFile(ctk.CTkFrame):
         
 
 class ImageCanvas(Canvas):
-    def __init__(self, parent, resize_image):
+    def __init__(self, parent, resize_image, get_coordinates):
         super().__init__(parent, bg='black', bd=0, relief='ridge', highlightthickness=0)
 
         # layout
         self.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
         self.bind('<Configure>', resize_image)
+        self.bind('<B1-Motion>', get_coordinates)
+
 
 
 

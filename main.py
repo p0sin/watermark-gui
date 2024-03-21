@@ -1,7 +1,5 @@
-from typing import Tuple
 import customtkinter as ctk
 from PIL import Image, ImageTk, ImageDraw, ImageFont, ImageColor
-import time
 
 from constants import *
 from menu import Menu
@@ -28,6 +26,9 @@ class App(ctk.CTk):
         self.image_height = 0
         self.canvas_width = 0
         self.canvas_height = 0
+
+        self.mouse_x = 0
+        self.mouse_y = 0
 
         # Create an instance of AddFile with the callback function
         self.add_file = AddFile(self, self.import_image)
@@ -70,18 +71,19 @@ class App(ctk.CTk):
         rgb_opacity = int(opacity * 255)
         rgb = (rgb_color[0], rgb_color[1], rgb_color[2], rgb_opacity)
 
-        # Calculate the bounding box of the text
-        text_bbox = draw.textbbox((0, 0), text, font=font)
-
         # Calculate the position to draw the text in the center of the image
         image_width, image_height = self.image.size
-        text_position = (
-            (image_width - (text_bbox[2] - text_bbox[0])) // 2,
-            (image_height - (text_bbox[3] - text_bbox[1])) // 2
-        )
+        if self.mouse_y == 0 and self.mouse_x == 0:
+            x_pos = image_width // 2
+            y_pos = image_height // 2
+        else:
+            x_pos = int(self.mouse_x * image_width / self.canvas_width)
+            y_pos = int(self.mouse_y * image_height / self.canvas_height)
 
+        text_position = (x_pos, y_pos)
+  
         # Draw the text at the calculated position
-        draw.text(text_position, text, font=font, fill=rgb)
+        draw.text(text_position, text, anchor='mm', font=font, fill=rgb)
 
         # Overlay the text image onto the original image
         self.image = Image.alpha_composite(self.image, txt)
@@ -89,7 +91,12 @@ class App(ctk.CTk):
         # Place the resulting image
         self.place_image()
 
+    def get_coordinates(self, event):
+        self.mouse_x = event.x
+        self.mouse_y = event.y
 
+        self.manipulate_image()
+     
     def init_parameters(self):
         self.watermark_text = ctk.StringVar(value='')
         self.size_value = ctk.DoubleVar(value=10.0)
@@ -110,7 +117,7 @@ class App(ctk.CTk):
         self.image_tk = ImageTk.PhotoImage(self.image)
         
         self.add_file.grid_forget()
-        self.image_output = ImageCanvas(self, self.resize_image)
+        self.image_output = ImageCanvas(self, self.resize_image, self.get_coordinates)
         self.menu = Menu(
             self, 
             self.size_value, 
@@ -151,7 +158,5 @@ class App(ctk.CTk):
         resized_image = self.image.resize((self.image_width, self.image_height))
         self.image_tk = ImageTk.PhotoImage(resized_image)
         self.image_output.create_image(self.canvas_width / 2, self.canvas_height / 2, image=self.image_tk)
-    
-    
-
+        
 App()
