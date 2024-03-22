@@ -1,3 +1,5 @@
+# LISTS
+
 FONTS = [
     'Arial', 
     'Times', 
@@ -9,19 +11,26 @@ FONTS = [
     'Corbel']
 
 COLORS = [
-    "black",
-    "white",
-    "red",
-    "green",
-    "blue",
-    "yellow",
-    "orange",
-    "purple",
-    "pink",
-    "cyan",
-    "magenta",
-    "brown",
-    "gray",
-    "lightblue",
-    "darkgreen"
+    "Black",
+    "White",
+    "Red",
+    "Green",
+    "Blue",
+    "Yellow",
+    "Orange",
+    "Purple",
+    "Pink",
+    "Cyan",
+    "Magenta",
+    "Brown",
+    "Gray",
+    "Lightblue",
+    "Darkgreen"
 ]
+
+# START VALUES
+TEXT = ''
+SIZE = 10.0
+FONT = 'Arial'
+COLOR = 'White'
+OPACITY = 1.0

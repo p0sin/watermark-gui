@@ -47,9 +47,9 @@ class App(ctk.CTk):
         draw = ImageDraw.Draw(txt)
 
         # Font 
-        font_size = self.size_value.get() * 10
-        text = self.watermark_text.get()
-        font_family = self.font_value.get()
+        font_size = self.text_vars['size'].get() * 10
+        text = self.text_vars['text'].get() 
+        font_family = self.text_vars['font'].get() 
         
         # Check if font family is provided
         if font_family == '':
@@ -59,14 +59,14 @@ class App(ctk.CTk):
         font = ImageFont.truetype(f"{font_family.lower()}", font_size)
 
         # Color
-        color = self.color_value.get()
+        color = self.text_vars['color'].get() 
         
         # Check if color is provided
         if color == '':
             return
 
         # Calculate opacity
-        opacity = self.opacity_value.get()
+        opacity = self.text_vars['opacity'].get() 
         rgb_color = ImageColor.getrgb(color)
         rgb_opacity = int(opacity * 255)
         rgb = (rgb_color[0], rgb_color[1], rgb_color[2], rgb_opacity)
@@ -98,17 +98,17 @@ class App(ctk.CTk):
         self.manipulate_image()
      
     def init_parameters(self):
-        self.watermark_text = ctk.StringVar(value='')
-        self.size_value = ctk.DoubleVar(value=10.0)
-        self.font_value = ctk.StringVar(value='Arial')
-        self.color_value = ctk.StringVar(value='White')
-        self.opacity_value = ctk.DoubleVar(value=1.0)
+        self.text_vars = {
+            'text': ctk.StringVar(value=TEXT),
+            'size': ctk.DoubleVar(value=SIZE),
+            'font': ctk.StringVar(value=FONT),
+            'color': ctk.StringVar(value=COLOR),
+            'opacity': ctk.DoubleVar(value=OPACITY)
+        }
 
-        self.watermark_text.trace_add('write', self.manipulate_image)
-        self.size_value.trace_add('write', self.manipulate_image)
-        self.font_value.trace_add('write', self.manipulate_image)
-        self.color_value.trace_add('write', self.manipulate_image)
-        self.opacity_value.trace_add('write', self.manipulate_image)
+        # tracing
+        for var in self.text_vars.values():
+            var.trace_add('write', self.manipulate_image)
 
     def import_image(self, path):
         self.original = Image.open(path)
@@ -118,15 +118,7 @@ class App(ctk.CTk):
         
         self.add_file.grid_forget()
         self.image_output = ImageCanvas(self, self.resize_image, self.get_coordinates)
-        self.menu = Menu(
-            self, 
-            self.size_value, 
-            self.watermark_text, 
-            self.font_value, 
-            FONTS, 
-            self.color_value, 
-            COLORS,
-            self.opacity_value)
+        self.menu = Menu(self, self.text_vars, self.close_edit, self.export_image)
 
     def close_edit(self):
         self.image_output.grid_forget()
@@ -158,5 +150,10 @@ class App(ctk.CTk):
         resized_image = self.image.resize((self.image_width, self.image_height))
         self.image_tk = ImageTk.PhotoImage(resized_image)
         self.image_output.create_image(self.canvas_width / 2, self.canvas_height / 2, image=self.image_tk)
-        
+
+    def export_image(self, name, path):
+        export_string = f'{path}/{name}.png'
+        self.image.save(export_string)
+        print(export_string)
+        self.close_edit()    
 App()
